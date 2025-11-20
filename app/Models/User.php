@@ -1,22 +1,22 @@
 <?php
-// app/Models/User.php
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasRoles;
+    use Notifiable;
 
     protected $fillable = [
         'name',
         'email',
         'password',
-        'pt_id',
+        'company_id',
+        'role',
+        'is_active',
     ];
 
     protected $hidden = [
@@ -24,26 +24,61 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    protected function casts(): array
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+        'is_active' => 'boolean',
+    ];
+
+    public function company(): BelongsTo
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return $this->belongsTo(Company::class);
     }
 
-    public function pt()
+    // Helper methods untuk cek role
+    public function isFounder(): bool
     {
-        return $this->belongsTo(Pt::class);
+        return $this->role === 'founder';
     }
 
-    public function scopeForPt($query, $ptId)
+    public function isDirektur(): bool
     {
-        return $query->where('pt_id', $ptId);
+        return $this->role === 'direktur';
     }
 
-    public function isFounder()
+    public function isKomisaris(): bool
     {
-        return $this->hasRole('founder');
+        return $this->role === 'komisaris';
+    }
+
+    public function isAdminPemberkasan(): bool
+    {
+        return $this->role === 'admin_pemberkasan';
+    }
+
+    public function isAdminKeuangan(): bool
+    {
+        return $this->role === 'admin_keuangan';
+    }
+
+    public function canAccessCompany(int $companyId): bool
+    {
+        // Founder bisa akses semua PT
+        if ($this->isFounder()) {
+            return true;
+        }
+
+        // Role lain hanya bisa akses PT sendiri
+        return $this->company_id === $companyId;
+    }
+
+    public function canManageDocuments(): bool
+    {
+        return $this->isAdminPemberkasan();
+    }
+
+    public function canManageFinancialReports(): bool
+    {
+        return $this->isAdminKeuangan();
     }
 }
