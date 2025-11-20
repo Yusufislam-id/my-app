@@ -9,6 +9,8 @@ use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 
@@ -18,48 +20,73 @@ class DocumentsTable
     {
         return $table
             ->columns([
-                TextColumn::make('company.name')
-                    ->searchable(),
-                TextColumn::make('created_by')
-                    ->numeric()
-                    ->sortable(),
                 TextColumn::make('nama_lengkap')
                     ->searchable(),
-                TextColumn::make('surat_pengajuan_rumah')
-                    ->searchable(),
-                TextColumn::make('dokumen_ktp')
-                    ->searchable(),
-                TextColumn::make('dokumen_kk')
-                    ->searchable(),
-                TextColumn::make('dokumen_npwp')
-                    ->searchable(),
-                TextColumn::make('surat_keterangan_kerja')
-                    ->searchable(),
-                TextColumn::make('slip_gaji_3bulan')
-                    ->searchable(),
-                TextColumn::make('rekening_koran_3bulan')
-                    ->searchable(),
-                TextColumn::make('surat_keterangan_usaha')
-                    ->searchable(),
-                TextColumn::make('neraca_keuangan_6bulan')
-                    ->searchable(),
-                TextColumn::make('status')
-                    ->badge(),
-                TextColumn::make('created_at')
-                    ->dateTime()
+
+                TextColumn::make('company.name')
+                    ->label('Perusahaan')
+                    ->searchable()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->visible(fn () => auth()->user()->isFounder()),
+
+                TextColumn::make('creator.name')
+                    ->label('Dibuat Oleh')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(),
+
+                TextColumn::make('status')
+                    ->label('Status')
+                    ->badge()
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'draft' => 'Draft',
+                        'submitted' => 'Diajukan',
+                        'reviewed' => 'Direview',
+                        'approved' => 'Disetujui',
+                        'rejected' => 'Ditolak',
+                        default => $state,
+                    })
+                    ->color(fn (string $state): string => match ($state) {
+                        'draft' => 'gray',
+                        'submitted' => 'warning',
+                        'reviewed' => 'info',
+                        'approved' => 'success',
+                        'rejected' => 'danger',
+                        default => 'gray',
+                    })
+                    ->sortable(),
+
+                TextColumn::make('created_at')
+                    ->label('Tanggal Dibuat')
+                    ->dateTime('d M Y H:i')
+                    ->sortable(),
+
                 TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('deleted_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                TrashedFilter::make(),
+                SelectFilter::make('status')
+                    ->label('Status')
+                    ->options([
+                        'draft' => 'Draft',
+                        'submitted' => 'Diajukan',
+                        'reviewed' => 'Direview',
+                        'approved' => 'Disetujui',
+                        'rejected' => 'Ditolak',
+                    ]),
+                SelectFilter::make('company_id')
+                    ->label('Perusahaan')
+                    ->relationship('company', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->visible(fn () => auth()->user()->isFounder()),
             ])
             ->recordActions([
                 ViewAction::make(),
