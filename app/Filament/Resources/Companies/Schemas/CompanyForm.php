@@ -13,10 +13,18 @@ class CompanyForm
         return $schema
             ->components([
                 TextInput::make('name')
-                    ->required(),
+                    ->label('Nama Perusahaan')
+                    ->required()
+                    ->maxLength(255),
                 TextInput::make('code')
-                    ->required(),
+                    ->label('Kode')
+                    ->required()
+                    ->unique(ignoreRecord: true)
+                    ->maxLength(255)
+                    ->placeholder('Contoh: PAS'),
                 Toggle::make('is_active')
+                    ->label('Aktif')
+                    ->default(true)
                     ->required(),
             ]);
     }
