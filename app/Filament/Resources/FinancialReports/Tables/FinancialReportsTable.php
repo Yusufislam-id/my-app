@@ -2,15 +2,19 @@
 
 namespace App\Filament\Resources\FinancialReports\Tables;
 
+use App\Models\FinancialReport;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ForceDeleteBulkAction;
-use Filament\Actions\RestoreBulkAction;
+use Filament\Forms\Components\TextInput;
 use Filament\Actions\ViewAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class FinancialReportsTable
 {
@@ -18,55 +22,110 @@ class FinancialReportsTable
     {
         return $table
             ->columns([
-                TextColumn::make('company.name')
-                    ->searchable(),
-                TextColumn::make('created_by')
-                    ->numeric()
-                    ->sortable(),
                 TextColumn::make('periode')
-                    ->searchable(),
-                TextColumn::make('laporan_keuangan_pt')
-                    ->searchable(),
-                TextColumn::make('laporan_data_konsumen')
-                    ->searchable(),
-                TextColumn::make('sp3k')
-                    ->searchable(),
-                TextColumn::make('pengisian_data_myob')
-                    ->searchable(),
-                TextColumn::make('laporan_keuangan')
-                    ->searchable(),
-                TextColumn::make('laporan_kas_lapangan')
-                    ->searchable(),
-                TextColumn::make('laporan_kas_pt')
-                    ->searchable(),
+                    ->label('Periode')
+                    ->searchable()
+                    ->sortable()
+                    ->badge()
+                    ->color('info'),
+                TextColumn::make('company.name')
+                    ->label('Perusahaan')
+                    ->searchable()
+                    ->sortable()
+                    ->visible(fn () => auth()->user()->isFounder()),
+                TextColumn::make('creator.name')
+                    ->label('Dibuat Oleh')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(),
                 TextColumn::make('status')
-                    ->badge(),
+                    ->label('Status')
+                    ->badge()
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'draft' => 'Draft',
+                        'submitted' => 'Diajukan',
+                        'reviewed' => 'Direview',
+                        'approved' => 'Disetujui',
+                        'rejected' => 'Ditolak',
+                        default => $state,
+                    })
+                    ->color(fn (string $state): string => match ($state) {
+                        'draft' => 'gray',
+                        'submitted' => 'warning',
+                        'reviewed' => 'info',
+                        'approved' => 'success',
+                        'rejected' => 'danger',
+                        default => 'gray',
+                    })
+                    ->sortable(),
+                IconColumn::make('has_files')
+                    ->label('File')
+                    ->boolean()
+                    ->getStateUsing(function (FinancialReport $record): bool {
+                        return (bool) (
+                            $record->laporan_keuangan_pt
+                            || $record->laporan_data_konsumen
+                            || $record->sp3k
+                            || $record->pengisian_data_myob
+                            || $record->laporan_keuangan
+                            || $record->laporan_kas_lapangan
+                            || $record->laporan_kas_pt
+                        );
+                    })
+                    ->toggleable(),
                 TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('deleted_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->label('Tanggal Dibuat')
+                    ->dateTime('d M Y H:i')
+                    ->sortable(),
             ])
             ->filters([
-                TrashedFilter::make(),
+                SelectFilter::make('status')
+                    ->label('Status')
+                    ->options([
+                        'draft' => 'Draft',
+                        'submitted' => 'Diajukan',
+                        'reviewed' => 'Direview',
+                        'approved' => 'Disetujui',
+                        'rejected' => 'Ditolak',
+                    ]),
+                SelectFilter::make('company_id')
+                    ->label('Perusahaan')
+                    ->relationship('company', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->visible(fn () => auth()->user()->isFounder()),
+                Filter::make('periode')
+                    ->form([
+                        TextInput::make('periode')
+                            ->label('Cari Periode')
+                            ->placeholder('Contoh: 2024-01'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query->when(
+                            $data['periode'] ?? null,
+                            fn (Builder $query, $periode): Builder => $query->where('periode', 'like', "%{$periode}%"),
+                        );
+                    }),
             ])
-            ->recordActions([
+            ->actions([
                 ViewAction::make(),
-                EditAction::make(),
+                EditAction::make()
+                    ->visible(fn () => auth()->user()->isAdminKeuangan()),
+                DeleteAction::make()
+                    ->visible(fn () => auth()->user()->isAdminKeuangan()),
             ])
-            ->toolbarActions([
+            ->bulkActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                    ForceDeleteBulkAction::make(),
-                    RestoreBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->visible(fn () => auth()->user()->isAdminKeuangan()),
                 ]),
-            ]);
+            ])
+            ->modifyQueryUsing(function (Builder $query): void {
+                $user = auth()->user();
+
+                if (! $user->isFounder()) {
+                    $query->where('company_id', $user->company_id);
+                }
+            });
     }
 }
