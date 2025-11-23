@@ -28,6 +28,7 @@ class UserForm
                     ->relationship('company', 'name'),
                 Select::make('role')
                     ->options([
+            'super_admin' => 'Super Admin',
             'founder' => 'Founder',
             'direktur' => 'Direktur',
             'komisaris' => 'Komisaris',
