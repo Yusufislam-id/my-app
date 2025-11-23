@@ -22,11 +22,13 @@ class FinancialReportResource extends Resource
 {
     protected static ?string $model = FinancialReport::class;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Manajemen Data';
+    protected static string|\UnitEnum|null $navigationGroup = 'Manajemen Data (Form Lama)';
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar';
 
     protected static ?string $navigationLabel = 'Laporan Keuangan';
+
+    protected static ?int $navigationSort = 2;
 
     public static function form(Schema $schema): Schema
     {

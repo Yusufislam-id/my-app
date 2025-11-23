@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Filament\Resources\FinancialReports\Pages;
+namespace App\Filament\Resources\ProjectFinances\Pages;
 
-use App\Filament\Resources\FinancialReports\FinancialReportResource;
+use App\Filament\Resources\ProjectFinances\ProjectFinanceResource;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
 
-class EditFinancialReport extends EditRecord
+class EditProjectFinance extends EditRecord
 {
-    protected static string $resource = FinancialReportResource::class;
+    protected static string $resource = ProjectFinanceResource::class;
 
     protected function getHeaderActions(): array
     {

@@ -22,4 +22,9 @@ class EditDocument extends EditRecord
             RestoreAction::make(),
         ];
     }
+
+    protected function getRedirectUrl(): string
+    {
+        return static::getResource()::getUrl('index');
+    }
 }

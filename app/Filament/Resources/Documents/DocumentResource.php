@@ -22,11 +22,11 @@ class DocumentResource extends Resource
 {
     protected static ?string $model = Document::class;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Manajemen Data';
+    protected static string|\UnitEnum|null $navigationGroup = 'Manajemen Data (Form Lama)';
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
 
-    protected static ?string $navigationLabel = 'Dokumen';
+    protected static ?string $navigationLabel = 'Dokumen Pemberkasan';
 
     protected static ?int $navigationSort = 1;
 

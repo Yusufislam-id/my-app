@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Filament\Resources\FinancialReports\Pages;
+namespace App\Filament\Resources\DailyReports\Pages;
 
-use App\Filament\Resources\FinancialReports\FinancialReportResource;
+use App\Filament\Resources\DailyReports\DailyReportResource;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
 
-class EditFinancialReport extends EditRecord
+class EditDailyReport extends EditRecord
 {
-    protected static string $resource = FinancialReportResource::class;
+    protected static string $resource = DailyReportResource::class;
 
     protected function getHeaderActions(): array
     {
@@ -21,6 +21,16 @@ class EditFinancialReport extends EditRecord
             ForceDeleteAction::make(),
             RestoreAction::make(),
         ];
+    }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        // Prevent non-founders from changing company_id
+        if (!auth()->user()->isFounder()) {
+            $data['company_id'] = $this->record->company_id;
+        }
+        
+        return $data;
     }
 
     protected function getRedirectUrl(): string
