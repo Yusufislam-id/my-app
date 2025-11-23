@@ -59,9 +59,10 @@ class AdminPanelProvider extends PanelProvider
             ->brandName('Sistem Pemberkasan Digital')
             ->favicon(asset('images/favicon.png'))
             ->navigationGroups([
-                'Admin Berkas',
-                'Admin Keuangan',
                 'Master Data',
+                'Manajemen Data (Form Lama)',
+                'Admin Pemberkasan (Form Baru)',
+                'Admin Keuangan (Form Baru)',
             ])
             ->sidebarCollapsibleOnDesktop();
     }
