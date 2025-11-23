@@ -34,4 +34,19 @@ class Company extends Model
     {
         return $this->hasMany(FinancialReport::class);
     }
+
+        public function housingLocations(): HasMany
+    {
+        return $this->hasMany(HousingLocation::class);
+    }
+
+    public function dailyReports(): HasMany
+    {
+        return $this->hasMany(DailyReport::class);
+    }
+
+    public function projectFinances(): HasMany
+    {
+        return $this->hasMany(ProjectFinance::class);
+    }
 }

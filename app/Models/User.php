@@ -61,10 +61,15 @@ class User extends Authenticatable
         return $this->role === 'admin_keuangan';
     }
 
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === 'super_admin';
+    }
+
     public function canAccessCompany(int $companyId): bool
     {
-        // Founder bisa akses semua PT
-        if ($this->isFounder()) {
+        // Super Admin dan Founder bisa akses semua PT
+        if ($this->isSuperAdmin() || $this->isFounder()) {
             return true;
         }
 
