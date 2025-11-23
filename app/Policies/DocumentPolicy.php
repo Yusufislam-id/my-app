@@ -15,6 +15,11 @@ class DocumentPolicy
 
     public function view(User $user, Document $document): bool
     {
+        // Super Admin bisa lihat semua dokumen
+        if ($user->isSuperAdmin()) {
+            return true;
+        }
+
         // Founder bisa lihat semua dokumen
         if ($user->isFounder()) {
             return true;
@@ -26,12 +31,22 @@ class DocumentPolicy
 
     public function create(User $user): bool
     {
+        // Super Admin bisa membuat dokumen
+        if ($user->isSuperAdmin()) {
+            return true;
+        }
+
         // Hanya Admin Pemberkasan yang bisa membuat dokumen
         return $user->isAdminPemberkasan();
     }
 
     public function update(User $user, Document $document): bool
     {
+        // Super Admin bisa update semua dokumen
+        if ($user->isSuperAdmin()) {
+            return true;
+        }
+
         // Hanya Admin Pemberkasan dari PT yang sama yang bisa update
         return $user->isAdminPemberkasan() && 
                $user->company_id === $document->company_id;
@@ -39,6 +54,11 @@ class DocumentPolicy
 
     public function delete(User $user, Document $document): bool
     {
+        // Super Admin bisa delete semua dokumen
+        if ($user->isSuperAdmin()) {
+            return true;
+        }
+
         // Hanya Admin Pemberkasan dari PT yang sama yang bisa delete
         return $user->isAdminPemberkasan() && 
                $user->company_id === $document->company_id;
