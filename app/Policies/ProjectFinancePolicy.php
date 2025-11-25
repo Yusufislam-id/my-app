@@ -2,10 +2,10 @@
 
 namespace App\Policies;
 
-use App\Models\FinancialReport;
+use App\Models\ProjectFinance;
 use App\Models\User;
 
-class FinancialReportPolicy
+class ProjectFinancePolicy
 {
     public function viewAny(User $user): bool
     {
@@ -13,7 +13,7 @@ class FinancialReportPolicy
         return !$user->isAdminPemberkasan();
     }
 
-    public function view(User $user, FinancialReport $report): bool
+    public function view(User $user, ProjectFinance $projectFinance): bool
     {
         // Super Admin bisa lihat semua laporan
         if ($user->isSuperAdmin()) {
@@ -25,8 +25,8 @@ class FinancialReportPolicy
             return true;
         }
 
-        // User lain hanya bisa lihat laporan dari PT sendiri
-        return $user->company_id === $report->company_id;
+        // User lain hanya bisa lihat dari PT sendiri
+        return $user->company_id === $projectFinance->company_id;
     }
 
     public function create(User $user): bool
@@ -40,7 +40,7 @@ class FinancialReportPolicy
         return $user->isAdminKeuangan();
     }
 
-    public function update(User $user, FinancialReport $report): bool
+    public function update(User $user, ProjectFinance $projectFinance): bool
     {
         // Super Admin bisa update semua laporan
         if ($user->isSuperAdmin()) {
@@ -49,18 +49,29 @@ class FinancialReportPolicy
 
         // Hanya Admin Keuangan dari PT yang sama yang bisa update
         return $user->isAdminKeuangan() &&
-            $user->company_id === $report->company_id;
+            $user->company_id === $projectFinance->company_id;
     }
 
-    public function delete(User $user, FinancialReport $report): bool
+    public function delete(User $user, ProjectFinance $projectFinance): bool
     {
-        // Super Admin bisa delete semua laporan
+        // Super Admin bisa delete semua
         if ($user->isSuperAdmin()) {
             return true;
         }
 
-        // Hanya Admin Keuangan dari PT yang sama yang bisa delete
+        // Admin Keuangan hanya bisa delete dari PT yang sama
         return $user->isAdminKeuangan() &&
-            $user->company_id === $report->company_id;
+            $user->company_id === $projectFinance->company_id;
+    }
+
+    public function restore(User $user, ProjectFinance $projectFinance): bool
+    {
+        return $user->isSuperAdmin() ||
+            ($user->isAdminKeuangan() && $user->company_id === $projectFinance->company_id);
+    }
+
+    public function forceDelete(User $user, ProjectFinance $projectFinance): bool
+    {
+        return $user->isSuperAdmin();
     }
 }

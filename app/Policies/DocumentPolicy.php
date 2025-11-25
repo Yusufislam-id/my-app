@@ -9,8 +9,8 @@ class DocumentPolicy
 {
     public function viewAny(User $user): bool
     {
-        // Semua user yang terautentikasi bisa melihat list dokumen
-        return true;
+        // Semua user kecuali Admin Keuangan bisa lihat menu
+        return !$user->isAdminKeuangan();
     }
 
     public function view(User $user, Document $document): bool
@@ -48,8 +48,8 @@ class DocumentPolicy
         }
 
         // Hanya Admin Pemberkasan dari PT yang sama yang bisa update
-        return $user->isAdminPemberkasan() && 
-               $user->company_id === $document->company_id;
+        return $user->isAdminPemberkasan() &&
+            $user->company_id === $document->company_id;
     }
 
     public function delete(User $user, Document $document): bool
@@ -60,7 +60,7 @@ class DocumentPolicy
         }
 
         // Hanya Admin Pemberkasan dari PT yang sama yang bisa delete
-        return $user->isAdminPemberkasan() && 
-               $user->company_id === $document->company_id;
+        return $user->isAdminPemberkasan() &&
+            $user->company_id === $document->company_id;
     }
 }
