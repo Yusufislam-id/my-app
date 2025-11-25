@@ -464,7 +464,7 @@ chmod -R 775 bootstrap/cache
 
 | Table | Description |
 |-------|-------------|
-| `companies` | Data perusahaan (3 PT) |
+| `companies` | Data perusahaan (Multi PT) |
 | `users` | User dengan role & company |
 | `housing_locations` | Lokasi perumahan per PT |
 | `documents` | Dokumen pemberkasan (KTP, KK, dll) |
