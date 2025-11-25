@@ -25,18 +25,18 @@ class DailyReportsTable
                     ->searchable()
                     ->sortable()
                     ->wrap(),
-                
+
                 TextColumn::make('report_type')
                     ->label('Jenis Laporan')
                     ->badge()
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                    ->formatStateUsing(fn(string $state): string => match ($state) {
                         'daily_report' => 'Daily Report',
                         'control_report' => 'Control Report',
                         'rekap_subsidi' => 'Rekap Subsidi',
                         'rekap_premio' => 'Rekap Premio',
                         default => $state,
                     })
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'daily_report' => 'primary',
                         'control_report' => 'info',
                         'rekap_subsidi' => 'success',
@@ -44,28 +44,28 @@ class DailyReportsTable
                         default => 'gray',
                     })
                     ->sortable(),
-                
+
                 TextColumn::make('report_date')
                     ->label('Tanggal')
                     ->date('d M Y')
                     ->sortable(),
-                
+
                 TextColumn::make('company.name')
                     ->label('Perusahaan')
                     ->searchable()
                     ->sortable()
-                    ->visible(fn () => auth()->user()->isFounder())
+                    ->visible(fn() => auth()->user()->isFounder() || auth()->user()->isSuperAdmin())
                     ->toggleable(),
-                
+
                 TextColumn::make('creator.name')
                     ->label('Dibuat Oleh')
                     ->searchable()
                     ->toggleable(),
-                
+
                 TextColumn::make('status')
                     ->label('Status')
                     ->badge()
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                    ->formatStateUsing(fn(string $state): string => match ($state) {
                         'draft' => 'Draft',
                         'submitted' => 'Diajukan',
                         'reviewed' => 'Direview',
@@ -73,7 +73,7 @@ class DailyReportsTable
                         'rejected' => 'Ditolak',
                         default => $state,
                     })
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'draft' => 'gray',
                         'submitted' => 'warning',
                         'reviewed' => 'info',
@@ -82,12 +82,12 @@ class DailyReportsTable
                         default => 'gray',
                     })
                     ->sortable(),
-                
+
                 IconColumn::make('file_path')
                     ->label('File')
                     ->boolean()
-                    ->getStateUsing(fn ($record) => !empty($record->file_path)),
-                
+                    ->getStateUsing(fn($record) => !empty($record->file_path)),
+
                 TextColumn::make('created_at')
                     ->label('Dibuat')
                     ->dateTime('d M Y H:i')
@@ -103,13 +103,13 @@ class DailyReportsTable
                         'rekap_subsidi' => 'Rekap Proyek Subsidi',
                         'rekap_premio' => 'Rekap Proyek Premio',
                     ]),
-                
+
                 SelectFilter::make('housing_location_id')
                     ->label('Lokasi Perumahan')
                     ->relationship('housingLocation', 'name')
                     ->searchable()
                     ->preload(),
-                
+
                 SelectFilter::make('status')
                     ->label('Status')
                     ->options([
@@ -119,7 +119,7 @@ class DailyReportsTable
                         'approved' => 'Disetujui',
                         'rejected' => 'Ditolak',
                     ]),
-                
+
                 Filter::make('report_date')
                     ->form([
                         DatePicker::make('from')
@@ -131,29 +131,29 @@ class DailyReportsTable
                         return $query
                             ->when(
                                 $data['from'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('report_date', '>=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('report_date', '>=', $date),
                             )
                             ->when(
                                 $data['until'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('report_date', '<=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('report_date', '<=', $date),
                             );
                     }),
             ])
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make()
-                    ->visible(fn () => auth()->user()->isAdminPemberkasan()),
+                    ->visible(fn() => auth()->user()->isAdminPemberkasan()),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make()
-                        ->visible(fn () => auth()->user()->isAdminPemberkasan()),
+                        ->visible(fn() => auth()->user()->isAdminPemberkasan()),
                 ]),
             ])
             ->modifyQueryUsing(function (Builder $query) {
                 $user = auth()->user();
-                
-                if (!$user->isFounder()) {
+
+                if (!($user->isFounder() || $user->isSuperAdmin())) {
                     $query->where('company_id', $user->company_id);
                 }
             })

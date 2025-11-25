@@ -25,7 +25,7 @@ class DailyReportResource extends Resource
 
     protected static ?string $navigationLabel = 'Laporan Harian';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Admin Pemberkasan (Form Baru)';
+    protected static string|\UnitEnum|null $navigationGroup = 'Admin Pemberkasan';
 
     protected static ?int $navigationSort = 1;
 
@@ -59,17 +59,6 @@ class DailyReportResource extends Resource
             'view' => ViewDailyReport::route('/{record}'),
             'edit' => EditDailyReport::route('/{record}/edit'),
         ];
-    }
-
-    public static function canCreate(): bool
-    {
-        $user = auth()->user();
-        return $user->isSuperAdmin() || $user->isAdminPemberkasan();
-    }
-
-    public static function canViewAny(): bool
-    {
-        return true; // Semua user bisa lihat
     }
 
     public static function getRecordRouteBindingEloquentQuery(): Builder
