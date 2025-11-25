@@ -27,7 +27,7 @@ class DocumentsTable
                     ->label('Perusahaan')
                     ->searchable()
                     ->sortable()
-                    ->visible(fn () => auth()->user()->isFounder()),
+                    ->visible(fn() => auth()->user()->isFounder() || auth()->user()->isSuperAdmin()),
 
                 TextColumn::make('creator.name')
                     ->label('Dibuat Oleh')
@@ -38,7 +38,7 @@ class DocumentsTable
                 TextColumn::make('status')
                     ->label('Status')
                     ->badge()
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                    ->formatStateUsing(fn(string $state): string => match ($state) {
                         'draft' => 'Draft',
                         'submitted' => 'Diajukan',
                         'reviewed' => 'Direview',
@@ -46,7 +46,7 @@ class DocumentsTable
                         'rejected' => 'Ditolak',
                         default => $state,
                     })
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'draft' => 'gray',
                         'submitted' => 'warning',
                         'reviewed' => 'info',
@@ -86,7 +86,7 @@ class DocumentsTable
                     ->relationship('company', 'name')
                     ->searchable()
                     ->preload()
-                    ->visible(fn () => auth()->user()->isFounder()),
+                    ->visible(fn() => auth()->user()->isFounder() || auth()->user()->isSuperAdmin()),
             ])
             ->recordActions([
                 ViewAction::make(),
