@@ -23,36 +23,36 @@ class HousingLocationsTable
                     ->label('Perusahaan')
                     ->searchable()
                     ->sortable()
-                    ->visible(fn () => auth()->user()->isFounder()),
-                
+                    ->visible(fn() => auth()->user()->isFounder() || auth()->user()->isSuperAdmin()),
+
                 TextColumn::make('name')
                     ->label('Nama Lokasi')
                     ->searchable()
                     ->sortable(),
-                
+
                 TextColumn::make('code')
                     ->label('Kode')
                     ->searchable()
                     ->sortable()
                     ->badge()
                     ->color('info'),
-                
+
                 TextColumn::make('address')
                     ->label('Alamat')
                     ->limit(50)
                     ->toggleable(),
-                
+
                 IconColumn::make('is_active')
                     ->label('Status')
                     ->boolean()
                     ->sortable(),
-                
+
                 TextColumn::make('daily_reports_count')
                     ->label('Total Laporan')
                     ->counts('dailyReports')
                     ->sortable()
                     ->toggleable(),
-                
+
                 TextColumn::make('created_at')
                     ->label('Dibuat')
                     ->dateTime('d M Y')
@@ -65,8 +65,8 @@ class HousingLocationsTable
                     ->relationship('company', 'name')
                     ->searchable()
                     ->preload()
-                    ->visible(fn () => auth()->user()->isFounder()),
-                
+                    ->visible(fn() => auth()->user()->isFounder() || auth()->user()->isSuperAdmin()),
+
                 TernaryFilter::make('is_active')
                     ->label('Status')
                     ->placeholder('Semua')
@@ -84,8 +84,8 @@ class HousingLocationsTable
             ])
             ->modifyQueryUsing(function (Builder $query): void {
                 $user = auth()->user();
-                
-                if (!$user->isFounder()) {
+
+                if (!($user->isFounder() || $user->isSuperAdmin())) {
                     $query->where('company_id', $user->company_id);
                 }
             });

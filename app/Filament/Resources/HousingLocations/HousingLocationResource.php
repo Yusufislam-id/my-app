@@ -25,7 +25,7 @@ class HousingLocationResource extends Resource
 
     protected static ?string $navigationLabel = 'Lokasi Perumahan';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Master Data';
+    protected static string|\UnitEnum|null $navigationGroup = 'Data Perumahan';
 
     protected static ?int $navigationSort = 3;
 
@@ -73,10 +73,10 @@ class HousingLocationResource extends Resource
     {
         $user = auth()->user();
         return $user->isSuperAdmin() ||
-               $user->isFounder() || 
-               $user->isDirektur() || 
-               $user->isKomisaris() ||
-               $user->isAdminPemberkasan() ||
-               $user->isAdminKeuangan();
+            $user->isFounder() ||
+            $user->isDirektur() ||
+            $user->isKomisaris() ||
+            $user->isAdminPemberkasan() ||
+            $user->isAdminKeuangan();
     }
 }

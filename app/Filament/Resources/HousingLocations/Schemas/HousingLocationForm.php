@@ -24,16 +24,22 @@ class HousingLocationForm
                             ->required()
                             ->searchable()
                             ->preload()
-                            ->default(fn () => auth()->user()->isFounder() ? null : auth()->user()->company_id)
-                            ->disabled(fn () => !auth()->user()->isFounder())
+                            ->default(
+                                fn() =>
+                                auth()->user()->isFounder() || auth()->user()->isSuperAdmin()
+                                    ? null
+                                    : auth()->user()->company_id
+                            )
+                            ->disabled(fn() =>
+                            !auth()->user()->isFounder() && !auth()->user()->isSuperAdmin())
                             ->dehydrated(),
-                        
+
                         TextInput::make('name')
                             ->label('Nama Lokasi Perumahan')
                             ->required()
                             ->maxLength(255)
                             ->placeholder('Contoh: Perumahan Griya Asri'),
-                        
+
                         TextInput::make('code')
                             ->label('Kode Lokasi')
                             ->required()
@@ -41,12 +47,12 @@ class HousingLocationForm
                             ->maxLength(50)
                             ->placeholder('Contoh: GRA-001')
                             ->alphaDash(),
-                        
+
                         Textarea::make('address')
                             ->label('Alamat')
                             ->rows(3)
                             ->columnSpanFull(),
-                        
+
                         Toggle::make('is_active')
                             ->label('Aktif')
                             ->default(true)
