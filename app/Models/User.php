@@ -82,7 +82,16 @@ class User extends Authenticatable
         return $this->isAdminPemberkasan();
     }
 
+    public function canManageDailyReports(): bool
+    {
+        return $this->isAdminPemberkasan();
+    }
     public function canManageFinancialReports(): bool
+    {
+        return $this->isAdminKeuangan();
+    }
+
+    public function canManageProjectFinances(): bool
     {
         return $this->isAdminKeuangan();
     }
