@@ -25,7 +25,7 @@ class ProjectFinanceResource extends Resource
 
     protected static ?string $navigationLabel = 'Keuangan Proyek';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Admin Keuangan (Form Baru)';
+    protected static string|\UnitEnum|null $navigationGroup = 'Admin Keuangan';
 
     protected static ?int $navigationSort = 1;
 
@@ -59,16 +59,5 @@ class ProjectFinanceResource extends Resource
             'view' => ViewProjectFinance::route('/{record}'),
             'edit' => EditProjectFinance::route('/{record}/edit'),
         ];
-    }
-
-    public static function canCreate(): bool
-    {
-        $user = auth()->user();
-        return $user->isSuperAdmin() || $user->isAdminKeuangan();
-    }
-
-    public static function canViewAny(): bool
-    {
-        return true; // Semua user bisa lihat
     }
 }

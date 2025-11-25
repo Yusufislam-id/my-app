@@ -29,7 +29,7 @@ class ProjectFinancesTable
                 TextColumn::make('finance_type')
                     ->label('Jenis')
                     ->badge()
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                    ->formatStateUsing(fn(string $state): string => match ($state) {
                         'laporan_keuangan' => 'Lap. Keuangan',
                         'petty_cash' => 'Petty Cash',
                         'data_pembayaran' => 'Data Pembayaran',
@@ -38,7 +38,7 @@ class ProjectFinancesTable
                         'biaya_material_tenaga' => 'Material & Tenaga',
                         default => $state,
                     })
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'laporan_keuangan' => 'primary',
                         'petty_cash' => 'warning',
                         'data_pembayaran' => 'info',
@@ -64,7 +64,7 @@ class ProjectFinancesTable
                     ->label('Perusahaan')
                     ->searchable()
                     ->sortable()
-                    ->visible(fn () => auth()->user()->isFounder())
+                    ->visible(fn() => auth()->user()->isFounder() || auth()->user()->isSuperAdmin())
                     ->toggleable(),
 
                 TextColumn::make('creator.name')
@@ -75,7 +75,7 @@ class ProjectFinancesTable
                 TextColumn::make('status')
                     ->label('Status')
                     ->badge()
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                    ->formatStateUsing(fn(string $state): string => match ($state) {
                         'draft' => 'Draft',
                         'submitted' => 'Diajukan',
                         'reviewed' => 'Direview',
@@ -83,7 +83,7 @@ class ProjectFinancesTable
                         'rejected' => 'Ditolak',
                         default => $state,
                     })
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'draft' => 'gray',
                         'submitted' => 'warning',
                         'reviewed' => 'info',
@@ -138,31 +138,31 @@ class ProjectFinancesTable
                         return $query
                             ->when(
                                 $data['from'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('report_date', '>=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('report_date', '>=', $date),
                             )
                             ->when(
                                 $data['until'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('report_date', '<=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('report_date', '<=', $date),
                             );
                     }),
             ])
             ->actions([
                 ViewAction::make(),
                 EditAction::make()
-                    ->visible(fn () => auth()->user()->isAdminKeuangan()),
+                    ->visible(fn() => auth()->user()->isAdminKeuangan() || auth()->user()->isSuperAdmin()),
                 DeleteAction::make()
-                    ->visible(fn () => auth()->user()->isAdminKeuangan()),
+                    ->visible(fn() => auth()->user()->isAdminKeuangan() || auth()->user()->isSuperAdmin()),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make()
-                        ->visible(fn () => auth()->user()->isAdminKeuangan()),
+                        ->visible(fn() => auth()->user()->isAdminKeuangan() || auth()->user()->isSuperAdmin()),
                 ]),
             ])
             ->modifyQueryUsing(function (Builder $query): void {
                 $user = auth()->user();
 
-                if (!$user->isFounder()) {
+                if (!($user->isFounder() || $user->isSuperAdmin())) {
                     $query->where('company_id', $user->company_id);
                 }
             })
