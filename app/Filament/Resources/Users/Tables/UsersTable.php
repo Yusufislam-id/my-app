@@ -23,7 +23,8 @@ class UsersTable
                     ->searchable(),
                 TextColumn::make('email_verified_at')
                     ->dateTime()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -35,6 +36,7 @@ class UsersTable
                 TextColumn::make('company.name')
                     ->searchable(),
                 TextColumn::make('role')
+                    ->sortable()
                     ->badge(),
                 IconColumn::make('is_active')
                     ->boolean(),
