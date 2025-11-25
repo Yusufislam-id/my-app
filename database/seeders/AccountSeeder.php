@@ -17,9 +17,9 @@ class AccountSeeder extends Seeder
     {
         // Create one company
         $company = Company::firstOrCreate(
-            ['code' => 'DEMO'],
+            ['code' => 'ASI'],
             [
-                'name' => 'PT. Demo Company',
+                'name' => 'PT. Anugrah Sumber Indah',
                 'is_active' => true,
             ]
         );
