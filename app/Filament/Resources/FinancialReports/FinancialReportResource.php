@@ -22,7 +22,7 @@ class FinancialReportResource extends Resource
 {
     protected static ?string $model = FinancialReport::class;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Manajemen Data (Form Lama)';
+    protected static string|\UnitEnum|null $navigationGroup = 'Admin Keuangan';
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar';
 
