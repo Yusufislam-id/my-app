@@ -60,9 +60,10 @@ class AdminPanelProvider extends PanelProvider
             ->favicon(asset('images/favicon.png'))
             ->navigationGroups([
                 'Master Data',
-                'Manajemen Data (Form Lama)',
-                'Admin Pemberkasan (Form Baru)',
-                'Admin Keuangan (Form Baru)',
+                'Data Perumahan',
+                'Admin Pemberkasan',
+                'Admin Keuangan',
+
             ])
             ->sidebarCollapsibleOnDesktop();
     }
