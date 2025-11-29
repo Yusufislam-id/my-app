@@ -11,7 +11,10 @@ class CreateDocument extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $data['company_id'] = auth()->user()->company_id;
+        // Set company_id from user if not super_admin, otherwise use selected value
+        if (!auth()->user()->isSuperAdmin()) {
+            $data['company_id'] = auth()->user()->company_id;
+        }
         $data['created_by'] = auth()->id();
         
         return $data;

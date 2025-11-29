@@ -69,4 +69,18 @@ class DocumentResource extends Resource
                 SoftDeletingScope::class,
             ]);
     }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+        $user = auth()->user();
+
+        // Super Admin dan Founder bisa lihat semua dokumen
+        if ($user->isSuperAdmin() || $user->isFounder()) {
+            return $query;
+        }
+
+        // User lain hanya bisa lihat dokumen dari PT sendiri
+        return $query->where('company_id', $user->company_id);
+    }
 }

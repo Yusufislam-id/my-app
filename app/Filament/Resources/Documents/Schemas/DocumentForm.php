@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Documents\Schemas;
 
+use App\Models\Company;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
@@ -13,10 +14,22 @@ class DocumentForm
 {
     public static function configure(Schema $schema): Schema
     {
+        $user = auth()->user();
+        
         return $schema
             ->components([
                 Section::make('Informasi Umum')
                     ->schema([
+                        Select::make('company_id')
+                            ->label('Perusahaan')
+                            ->options(
+                                Company::pluck('name', 'id')
+                            )
+                            ->required(fn () => $user->isSuperAdmin())
+                            ->searchable()
+                            ->preload()
+                            ->visible(fn () => $user->isSuperAdmin()),
+                        
                         TextInput::make('nama_lengkap')
                             ->label('Nama Lengkap')
                             ->maxLength(255)
