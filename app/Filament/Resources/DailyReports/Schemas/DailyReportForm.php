@@ -23,7 +23,10 @@ class DailyReportForm
                         Select::make('housing_location_id')
                             ->label('Nama Lokasi Perumahan')
                             ->options(
-                                HousingLocation::where('company_id', $user->company_id)
+                                HousingLocation::when(
+                                    !$user->isSuperAdmin(),
+                                    fn ($query) => $query->where('company_id', $user->company_id)
+                                )
                                     ->where('is_active', true)
                                     ->pluck('name', 'id')
                             )

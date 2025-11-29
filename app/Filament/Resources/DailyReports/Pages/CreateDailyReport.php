@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\DailyReports\Pages;
 
 use App\Filament\Resources\DailyReports\DailyReportResource;
+use App\Models\HousingLocation;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateDailyReport extends CreateRecord
@@ -11,7 +12,17 @@ class CreateDailyReport extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $data['company_id'] = auth()->user()->company_id;
+        // If super_admin, get company_id from the selected housing location
+        if (auth()->user()->isSuperAdmin()) {
+            $housingLocation = HousingLocation::find($data['housing_location_id']);
+            if ($housingLocation) {
+                $data['company_id'] = $housingLocation->company_id;
+            }
+        } else {
+            // Otherwise use user's company_id
+            $data['company_id'] = auth()->user()->company_id;
+        }
+        
         $data['created_by'] = auth()->id();
         
         return $data;
