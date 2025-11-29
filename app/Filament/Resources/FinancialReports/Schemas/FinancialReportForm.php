@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\FinancialReports\Schemas;
 
+use App\Models\Company;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -13,10 +14,22 @@ class FinancialReportForm
 {
     public static function configure(Schema $schema): Schema
     {
+        $user = auth()->user();
+
         return $schema
             ->components([
                 Section::make('Informasi Periode')
                     ->schema([
+                        Select::make('company_id')
+                            ->label('Perusahaan')
+                            ->options(
+                                Company::pluck('name', 'id')
+                            )
+                            ->required(fn() => $user->isSuperAdmin())
+                            ->searchable()
+                            ->preload()
+                            ->visible(fn() => $user->isSuperAdmin()),
+
                         TextInput::make('periode')
                             ->label('Periode')
                             ->required()
@@ -33,7 +46,7 @@ class FinancialReportForm
                             ])
                             ->default('draft')
                             ->required()
-                            ->visible(fn () => auth()->user()->isFounder()
+                            ->visible(fn() => auth()->user()->isFounder()
                                 || auth()->user()->isDirektur()
                                 || auth()->user()->isKomisaris()),
                         Textarea::make('catatan')
