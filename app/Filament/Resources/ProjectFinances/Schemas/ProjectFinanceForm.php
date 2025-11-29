@@ -24,7 +24,10 @@ class ProjectFinanceForm
                         Select::make('housing_location_id')
                             ->label('Nama Lokasi Perumahan')
                             ->options(
-                                HousingLocation::where('company_id', $user->company_id)
+                                HousingLocation::when(
+                                    !$user->isSuperAdmin(),
+                                    fn($query) => $query->where('company_id', $user->company_id)
+                                )
                                     ->where('is_active', true)
                                     ->pluck('name', 'id')
                             )
@@ -45,7 +48,7 @@ class ProjectFinanceForm
                             ])
                             ->required()
                             ->live()
-                            ->afterStateUpdated(fn ($set) => $set('total_amount', null)),
+                            ->afterStateUpdated(fn($set) => $set('total_amount', null)),
 
                         DatePicker::make('report_date')
                             ->label('Tanggal Laporan')
@@ -71,7 +74,7 @@ class ProjectFinanceForm
                             ])
                             ->default('draft')
                             ->required()
-                            ->visible(fn () => auth()->user()->isFounder() ||
+                            ->visible(fn() => auth()->user()->isFounder() ||
                                 auth()->user()->isDirektur() ||
                                 auth()->user()->isKomisaris()),
                     ])
@@ -89,7 +92,7 @@ class ProjectFinanceForm
                             ->downloadable()
                             ->openable(),
                     ])
-                    ->visible(fn ($get) => $get('finance_type') === 'laporan_keuangan'),
+                    ->visible(fn($get) => $get('finance_type') === 'laporan_keuangan'),
 
                 // PETTY CASH
                 Section::make('Upload File')
@@ -103,7 +106,7 @@ class ProjectFinanceForm
                             ->downloadable()
                             ->openable(),
                     ])
-                    ->visible(fn ($get) => $get('finance_type') === 'petty_cash'),
+                    ->visible(fn($get) => $get('finance_type') === 'petty_cash'),
 
                 // DATA PEMBAYARAN
                 Section::make('Upload File Data Pembayaran')
@@ -136,7 +139,7 @@ class ProjectFinanceForm
                             ->openable(),
                     ])
                     ->columns(3)
-                    ->visible(fn ($get) => $get('finance_type') === 'data_pembayaran'),
+                    ->visible(fn($get) => $get('finance_type') === 'data_pembayaran'),
 
                 // SP3K KONSUMEN
                 Section::make('Upload File')
@@ -150,7 +153,7 @@ class ProjectFinanceForm
                             ->downloadable()
                             ->openable(),
                     ])
-                    ->visible(fn ($get) => $get('finance_type') === 'sp3k_konsumen'),
+                    ->visible(fn($get) => $get('finance_type') === 'sp3k_konsumen'),
 
                 // PENCAIRAN KPR
                 Section::make('Upload File')
@@ -164,7 +167,7 @@ class ProjectFinanceForm
                             ->downloadable()
                             ->openable(),
                     ])
-                    ->visible(fn ($get) => $get('finance_type') === 'pencairan_kpr'),
+                    ->visible(fn($get) => $get('finance_type') === 'pencairan_kpr'),
 
                 // BIAYA MATERIAL & TENAGA
                 Section::make('Upload File')
@@ -178,7 +181,7 @@ class ProjectFinanceForm
                             ->downloadable()
                             ->openable(),
                     ])
-                    ->visible(fn ($get) => $get('finance_type') === 'biaya_material_tenaga'),
+                    ->visible(fn($get) => $get('finance_type') === 'biaya_material_tenaga'),
 
                 Section::make('Catatan')
                     ->schema([
