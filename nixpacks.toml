@@ -11,14 +11,14 @@ aptPkgs = [
     "php8.3-intl",
     "php8.3-bcmath",
     "composer",
-    "nginx",
-    "nodejs",
-    "npm"
+    "nginx"
 ]
+
+[nixpkgs]
+packages = ["nodejs_20", "npm"]
 
 [phases.build]
 cmds = [
-    
     "npm install",
     "npm run build",
     "php artisan key:generate",
