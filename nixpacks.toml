@@ -1,3 +1,6 @@
+[nixpkgs]
+packages = ["nodejs_22", "npm"]
+
 [phases.setup]
 aptPkgs = [
     "php8.3",
@@ -14,12 +17,9 @@ aptPkgs = [
     "nginx"
 ]
 
-[nixpkgs]
-packages = ["nodejs_20", "npm"]
-
 [phases.build]
 cmds = [
-    "npm install",
+    "npm ci",
     "npm run build",
     "php artisan key:generate",
     "php artisan storage:link",
